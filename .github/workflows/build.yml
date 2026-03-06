@@ -1,0 +1,45 @@
+name: Build APK
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+
+    - name: Install Cordova
+      run: npm install -g cordova
+
+    - name: Create Project Structure
+      run: |
+        mkdir -p www
+        # Files are already checked out
+
+    - name: Add Android Platform
+      run: cordova platform add android
+
+    - name: Build Debug APK
+      run: cordova build android
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Apk-Builder-Pro-APK
+        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
