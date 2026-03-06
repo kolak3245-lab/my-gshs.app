@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0c0f12">
+<title>APK Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0c0f12;--bg1:#111519;--bg2:#161c22;--bg3:#1c242c;
+  --card:#1a2029;--card2:#202830;
+  --border:#252f38;--border2:#2e3b47;
+  --accent:#00e5a0;--accent2:#00c486;--accent3:#00ffb3;
+  --abg:rgba(0,229,160,.09);--abg2:rgba(0,229,160,.16);--abg3:rgba(0,229,160,.25);
+  --text:#dde6ef;--text2:#7a95a8;--text3:#3f5463;
+  --red:#ff5a72;--redbg:rgba(255,90,114,.1);
+  --yellow:#ffc94d;--ybg:rgba(255,201,77,.1);
+  --blue:#5aacff;--bbg:rgba(90,172,255,.1);
+  --purple:#b57bff;--pbg:rgba(181,123,255,.1);
+  --touch:48px;--r:14px;--rsm:10px;--rxs:7px;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);
+  --topH:56px;--botH:64px;
+  --font:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100%;height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased;overscroll-behavior:none;line-height:1.5}
+
+/* APP SHELL */
+.app{display:flex;flex-direction:column;height:100%;height:100dvh;overflow:hidden;position:fixed;inset:0}
+
+/* TOP BAR */
+.topbar{flex-shrink:0;height:calc(var(--topH) + var(--sat));padding-top:var(--sat);background:rgba(12,15,18,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:flex-end;z-index:100}
+.tbi{height:var(--topH);width:100%;display:flex;align-items:center;padding:0 16px;gap:12px}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#0c0f12;font-weight:800;box-shadow:0 0 20px rgba(0,229,160,.3);flex-shrink:0}
+.logo-text{flex:1;min-width:0}
+.logo-name{font-size:16px;font-weight:800;letter-spacing:-.4px;line-height:1.1}
+.logo-sub{font-size:10px;color:var(--text2);letter-spacing:.3px;margin-top:1px}
+.topbar-btns{display:flex;gap:6px}
+.tbtn{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:15px;cursor:pointer;transition:all .15s;position:relative}
+.tbtn:active{transform:scale(.92);background:var(--border)}
+.tbtn.ac{background:var(--abg);border-color:rgba(0,229,160,.25);color:var(--accent)}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+.scroll::-webkit-scrollbar{display:none}
+.panel{display:none;padding:14px;padding-bottom:calc(14px + var(--botH) + var(--sab) + 10px);animation:fadeUp .25s ease both}
+.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* BOTTOM NAV */
+.botnav{flex-shrink:0;height:calc(var(--botH) + var(--sab));padding-bottom:var(--sab);background:rgba(12,15,18,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;align-items:flex-start;z-index:100}
+.nav-items{display:flex;width:100%;height:var(--botH)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:transparent;cursor:pointer;color:var(--text3);transition:color .2s;position:relative;min-height:var(--touch);padding:8px 4px;-webkit-tap-highlight-color:transparent}
+.ni i{font-size:20px;transition:transform .2s,color .2s}
+.ni span{font-size:10px;font-weight:600;letter-spacing:.3px;line-height:1;transition:color .2s}
+.ni.active{color:var(--accent)}
+.ni.active i{transform:scale(1.1)}
+.ni.active::before{content:'';position:absolute;top:6px;width:32px;height:3px;background:var(--accent);border-radius:0 0 3px 3px}
+.nbadge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;position:relative}
+.cb{padding:16px}
+.card.ca::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),transparent)}
+.ched{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.ctitle{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;letter-spacing:-.2px}
+.cicon{width:30px;height:30px;background:var(--abg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--accent);flex-shrink:0}
+.cdesc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px}
+.slbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);display:flex;align-items:center;gap:8px;margin-bottom:10px;margin-top:4px}
+.slbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* FORM */
+.fg{margin-bottom:14px}
+.fg:last-child{margin-bottom:0}
+.lbl{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin-bottom:7px}
+.lbl .req{color:var(--red);font-size:13px;line-height:1}
+.lbl .opt{margin-left:auto;font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--text3)}
+.fld{position:relative;display:flex;align-items:center}
+.fi{position:absolute;left:13px;color:var(--text3);font-size:14px;pointer-events:none;z-index:1}
+.fa2{position:absolute;right:6px;width:34px;height:34px;background:none;border:none;color:var(--text2);cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .15s}
+.fa2:active{background:var(--bg3)}
+input,select,textarea{width:100%;height:var(--touch);padding:0 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rsm);font-family:var(--font);font-size:15px;color:var(--text);outline:none;transition:border-color .15s,background .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--bg3);box-shadow:0 0 0 3px var(--abg)}
+input.hi{padding-left:40px}
+input.ha{padding-right:44px}
+input.mono,textarea.mono{font-family:var(--mono);font-size:13px;letter-spacing:.3px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a95a8' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;cursor:pointer}
+select.hi{padding-left:40px}
+textarea{height:auto;min-height:80px;padding:12px 14px;resize:none;line-height:1.6;font-size:14px}
+.hint{margin-top:5px;font-size:11px;color:var(--text3);display:flex;align-items:flex-start;gap:5px;line-height:1.5}
+.hint i{flex-shrink:0;margin-top:1px;font-size:10px}
+.ccnt{text-align:right;font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;flex-shrink:0}
+.badge i{font-size:7px}
+.bg{background:var(--abg);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.br{background:var(--redbg);color:var(--red);border:1px solid rgba(255,90,114,.2)}
+.by{background:var(--ybg);color:var(--yellow);border:1px solid rgba(255,201,77,.2)}
+.bb{background:var(--bbg);color:var(--blue);border:1px solid rgba(90,172,255,.2)}
+.bp{background:var(--pbg);color:var(--purple);border:1px solid rgba(181,123,255,.2)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:var(--touch);padding:0 20px;border:none;border-radius:var(--rsm);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.96)}
+.btn i{font-size:15px;flex-shrink:0}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0c0f12;box-shadow:0 4px 20px rgba(0,229,160,.3)}
+.btn-p:active{box-shadow:0 2px 10px rgba(0,229,160,.2)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-o{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn-o:active{background:var(--abg)}
+.btn-g{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.btn-g:active{background:var(--border)}
+.btn-d{background:var(--red);color:#fff}
+.btn-sm{height:38px;padding:0 14px;font-size:13px}
+.btn-xs{height:32px;padding:0 12px;font-size:12px}
+.btn-fw{width:100%}
+.spn{width:16px;height:16px;border:2px solid rgba(12,15,18,.25);border-top-color:#0c0f12;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn.loading .spn{display:block}
+.btn.loading .bt{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* UPLOAD */
+.dz{border:2px dashed var(--border);border-radius:var(--r);padding:28px 16px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2);position:relative;overflow:hidden}
+.dz::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,var(--abg),transparent 65%);opacity:0;transition:opacity .3s}
+.dz:active,.dz.over{border-color:var(--accent);border-style:solid}
+.dz:active::before,.dz.over::before{opacity:1}
+.dz.filled{border-color:var(--accent);border-style:solid;background:var(--abg)}
+.dz-ico{font-size:32px;color:var(--accent);margin-bottom:8px;display:block;position:relative;z-index:1}
+.dz-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;position:relative;z-index:1}
+.dz-sub{font-size:12px;color:var(--text2);position:relative;z-index:1}
+.dz-types{display:flex;gap:6px;justify-content:center;margin-top:10px;position:relative;z-index:1}
+.dz-type{font-family:var(--mono);font-size:9px;padding:2px 7px;background:var(--card);border:1px solid var(--border);border-radius:5px;color:var(--text3)}
+.fc{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:var(--rxs);padding:10px 12px;margin-top:12px;text-align:left;position:relative;z-index:1}
+.fc-ico{width:34px;height:34px;border-radius:8px;background:var(--abg);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:15px;flex-shrink:0}
+.fc-info{flex:1;min-width:0}
+.fc-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-size{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.fc-del{width:32px;height:32px;flex-shrink:0;background:var(--redbg);border:none;border-radius:8px;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+.fc-del:active{background:var(--red);color:#fff}
+
+/* ICON ZONE */
+.iz{display:flex;align-items:center;gap:14px;border:2px dashed var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;background:var(--bg2)}
+.iz:active,.iz.filled{border-color:var(--accent);border-style:solid;background:var(--abg)}
+.ithumb{width:56px;height:56px;border-radius:12px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;font-size:22px;color:var(--text3)}
+.ithumb img{width:100%;height:100%;object-fit:cover;display:none}
+.iz-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.iz-sub{font-size:11px;color:var(--text2)}
+.iz-chips{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.chip{font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 7px;background:var(--card);border:1px solid var(--border);border-radius:5px;color:var(--text3)}
+input[type="file"]{display:none}
+
+/* INFOBOX */
+.ib{border-radius:var(--rxs);padding:10px 13px;display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.6}
+.ib i{margin-top:1px;flex-shrink:0;font-size:13px}
+.ib-info{background:var(--bbg);border:1px solid rgba(90,172,255,.2);color:var(--blue)}
+.ib-warn{background:var(--ybg);border:1px solid rgba(255,201,77,.2);color:var(--yellow)}
+.ib-ok{background:var(--abg);border:1px solid rgba(0,229,160,.2);color:var(--accent)}
+.ib-err{background:var(--redbg);border:1px solid rgba(255,90,114,.2);color:var(--red)}
+
+/* PROGRESS */
+.pbar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:3px;transition:width .4s ease;position:relative}
+.pfill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:20px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:psh 1.5s linear infinite}
+@keyframes psh{0%{transform:translateX(-30px)}100%{transform:translateX(40px)}}
+
+/* READINESS */
+.ri{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ri:last-child{border-bottom:none}
+.ri-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .25s;background:var(--bg3);color:var(--text3);border:1.5px solid var(--border)}
+.ri-dot.ok{background:var(--abg);color:var(--accent);border-color:var(--accent)}
+.ri-dot.err{background:var(--redbg);color:var(--red);border-color:var(--red)}
+.ri-lbl{flex:1;font-size:13px;color:var(--text2)}
+.ri-lbl.ok{color:var(--text)}
+.ri-tag{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+/* BUILD STEPS */
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:12px;padding:12px 0;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;left:15px;top:40px;bottom:0;width:2px;background:var(--border);transition:background .3s}
+.step.done:not(:last-child)::after{background:var(--accent)}
+.snum{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;background:var(--bg2);color:var(--text3);border:2px solid var(--border);z-index:1;transition:all .3s}
+.step.active .snum{background:var(--abg2);color:var(--accent);border-color:var(--accent);animation:sp 2s ease infinite}
+@keyframes sp{0%,100%{box-shadow:0 0 0 0 rgba(0,229,160,.3)}50%{box-shadow:0 0 0 8px rgba(0,229,160,0)}}
+.step.done .snum{background:var(--accent);color:#0c0f12;border-color:var(--accent)}
+.step.error .snum{background:var(--redbg);color:var(--red);border-color:var(--red)}
+.sbody{flex:1;padding-top:4px}
+.stitle{font-size:13px;font-weight:700;color:var(--text);transition:color .2s}
+.step.active .stitle{color:var(--accent)}
+.step.done .stitle{color:var(--text)}
+.step.error .stitle{color:var(--red)}
+.ssub{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* LOGS */
+.lwrap{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.lhd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.lhd-l{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-family:var(--mono)}
+.lbody{padding:12px 14px;max-height:220px;overflow-y:auto;font-family:var(--mono);font-size:11px;line-height:1.9;-webkit-overflow-scrolling:touch}
+.lbody::-webkit-scrollbar{display:none}
+.log{display:flex;gap:10px;align-items:flex-start}
+.lts{color:var(--text3);flex-shrink:0;font-size:10px;padding-top:1px}
+.lmsg{color:var(--text2);word-break:break-all;flex:1}
+.log.ok .lmsg{color:var(--accent)}
+.log.err .lmsg{color:var(--red)}
+.log.info .lmsg{color:var(--blue)}
+.log.warn .lmsg{color:var(--yellow)}
+.cur{display:inline-block;width:6px;height:12px;background:var(--accent);vertical-align:text-bottom;animation:blink .7s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* DOWNLOAD CARD */
+.dlcard{display:none;text-align:center;background:linear-gradient(135deg,rgba(0,229,160,.07),rgba(0,229,160,.03));border:1px solid rgba(0,229,160,.25);border-radius:var(--r);padding:28px 20px}
+.dlcard.show{display:block;animation:fadeUp .35s ease}
+.dlico{font-size:52px;color:var(--accent);margin-bottom:10px;display:block;filter:drop-shadow(0 0 20px rgba(0,229,160,.4))}
+.dltitle{font-size:18px;font-weight:800;margin-bottom:4px;letter-spacing:-.3px}
+.dlsub{font-size:13px;color:var(--text2);margin-bottom:20px}
+.dlstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.dlstat{background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:12px 8px;text-align:center}
+.dlstat-v{font-size:16px;font-weight:800;font-family:var(--mono);color:var(--text);line-height:1}
+.dlstat-k{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+
+/* PERMS */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.perm{display:flex;align-items:center;gap:8px;padding:10px 11px;border-radius:var(--rxs);background:var(--bg2);border:1.5px solid var(--border);font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;min-height:44px}
+.perm:active{transform:scale(.97)}
+.perm.on{background:var(--abg);border-color:rgba(0,229,160,.25);color:var(--accent)}
+.perm i{font-size:15px;flex-shrink:0;width:18px;text-align:center}
+.pname{flex:1;font-size:10px;line-height:1.3}
+.pck{width:16px;height:16px;border-radius:4px;flex-shrink:0;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s}
+.perm.on .pck{background:var(--accent);border-color:var(--accent);color:#0c0f12}
+
+/* TOGGLE */
+.tog{width:50px;height:28px;border-radius:14px;background:var(--border);border:none;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;-webkit-tap-highlight-color:transparent}
+.tog.on{background:var(--accent)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tog.on::after{transform:translateX(22px)}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:14px;min-height:var(--touch)}
+.srow:last-child{border-bottom:none}
+.sr-lbl{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.sr-desc{font-size:11px;color:var(--text3);line-height:1.5}
+
+/* BUILD HERO */
+.bhero{text-align:center;padding:36px 20px 28px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;position:relative;overflow:hidden}
+.bhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(0,229,160,.07),transparent 60%)}
+.horb{width:68px;height:68px;margin:0 auto 16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(0,229,160,.25),transparent),var(--abg);border:1px solid rgba(0,229,160,.2);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--accent);box-shadow:0 0 40px rgba(0,229,160,.12);position:relative;z-index:1}
+.horb::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(0,229,160,.1);animation:orbR 2.5s ease infinite}
+@keyframes orbR{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.08);opacity:.3}}
+.htitle{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px;position:relative;z-index:1}
+.hdesc{font-size:13px;color:var(--text2);margin-bottom:22px;position:relative;z-index:1;line-height:1.6}
+
+/* BROWSER BAR */
+.bbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:8px}
+.bdots{display:flex;gap:5px;flex-shrink:0}
+.bdot{width:9px;height:9px;border-radius:50%}
+.bdot:nth-child(1){background:#ff5f57}.bdot:nth-child(2){background:#febc2e}.bdot:nth-child(3){background:#28c840}
+.burl{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-family:var(--mono);font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px;min-width:0}
+.burl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prev-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:340px;gap:12px;color:var(--text3)}
+.prev-empty i{font-size:52px;opacity:.2}
+.prev-empty p{font-size:14px;font-weight:700;opacity:.4}
+.prev-empty small{font-size:12px;opacity:.3;text-align:center;line-height:1.5}
+
+/* TOAST */
+.twrap{position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:0 14px;padding-bottom:calc(var(--botH) + var(--sab) + 10px);pointer-events:none;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.t{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:var(--rsm);background:var(--card2);border:1px solid var(--border2);box-shadow:0 8px 32px rgba(0,0,0,.5);font-size:13px;font-weight:600;animation:tIn .3s cubic-bezier(.34,1.56,.64,1);pointer-events:auto;cursor:pointer}
+.t.out{animation:tOut .25s ease forwards}
+.t i{font-size:17px;flex-shrink:0}
+.tok i{color:var(--accent)}.terr i{color:var(--red)}.twarn i{color:var(--yellow)}.tinfo i{color:var(--blue)}
+@keyframes tIn{from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateY(10px)}}
+
+/* MODAL SHEET */
+.mbg{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:0 0 var(--sab) 0;opacity:0;pointer-events:none;transition:opacity .25s}
+.mbg.open{opacity:1;pointer-events:auto}
+.msheet{background:var(--card);border-radius:20px 20px 0 0;border:1px solid var(--border2);border-bottom:none;width:100%;max-width:500px;padding:24px 20px;padding-bottom:calc(24px + var(--sab));box-shadow:0 -8px 48px rgba(0,0,0,.5);transform:translateY(30px);transition:transform .3s}
+.mbg.open .msheet{transform:translateY(0)}
+.mhandle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:-8px auto 20px}
+.mtitle{font-size:17px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.mbody{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.7}
+.mactions{display:flex;gap:10px}
+
+/* UTILS */
+.fb{display:flex;align-items:center;justify-content:space-between}
+.fc2{display:flex;align-items:center}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt14{margin-top:14px}
+.mb4{margin-bottom:4px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb14{margin-bottom:14px}
+.tsm{font-size:13px}.txs{font-size:11px}
+.tmuted{color:var(--text2)}.tdim{color:var(--text3)}
+.fmono{font-family:var(--mono)}.tac{color:var(--accent)}.tred{color:var(--red)}
+.fw7{font-weight:700}.fw8{font-weight:800}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tbi">
+    <div class="logo-mark"><i class="fa-solid fa-hammer"></i></div>
+    <div class="logo-text">
+      <div class="logo-name">Builder Pro</div>
+      <div class="logo-sub">Create By SuburDev 🇮🇩</div>
+    </div>
+    <div class="topbar-btns">
+      <!-- TOMBOL WHATSAPP DENGAN PESAN OTOMATIS -->
+      <button class="tbtn" onclick="window.open('https://wa.me/6288213415826?text=Halo Developer%2C%20Saya Butuh Aplikasi Builder Pro%20Mohon%20Di Respon%20Terimakasih🙏', '_blank')" title="Chat WhatsApp">
+        <i class="fa-brands fa-whatsapp" style="color:#25D366"></i>
+      </button>
+      <button class="tbtn ac" id="saveBtn"><i class="fa-solid fa-floppy-disk"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll" id="scroll">
+
+  <!-- ===== EDITOR ===== -->
+  <div class="panel active" id="panel-editor">
+
+    <!-- App Config -->
+    <div class="card ca">
+      <div class="cb">
+        <div class="ched">
+          <div class="ctitle"><div class="cicon"><i class="fa-solid fa-mobile-screen-button"></i></div>Konfigurasi Aplikasi</div>
+          <span class="badge by" id="cfgBadge"><i class="fa-solid fa-circle" style="font-size:6px"></i> Belum Lengkap</span>
+        </div>
+        <p class="cdesc">Tentukan identitas, versi, dan branding aplikasi Android Anda , Silahkan klik icon WhatsApp di Atas untuk Bantuan..</p>
+
+        <div class="fg">
+          <div class="lbl"><i class="fa-solid fa-tag tdim" style="font-size:11px"></i>Nama APK<span class="req">*</span></div>
+          <div class="fld"><i class="fi fa-solid fa-tag"></i><input type="text" class="hi" id="apkName" placeholder="Aplikasi Kerenku" maxlength="50" oninput="cC(this);chkCfg()"></div>
+          <div class="ccnt"><span id="apkNameC">0</span>/50</div>
+        </div>
+
+        <div class="r2 mb14">
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-layer-group tdim" style="font-size:10px"></i>Kategori</div>
+            <div class="fld"><i class="fi fa-solid fa-layer-group"></i>
+              <select class="hi" id="appCat"><option>Peralatan</option><option>Produktivitas</option><option>Pendidikan</option><option>Hiburan</option><option>Keuangan</option><option>Bisnis</option></select>
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-brands fa-android tdim" style="font-size:10px"></i>Min SDK</div>
+            <select id="minSdk"><option value="21">API 21 (5.0)</option><option value="23" selected>API 23 (6.0)</option><option value="24">API 24 (7.0)</option><option value="26">API 26 (8.0)</option><option value="28">API 28 (9.0)</option></select>
+          </div>
+        </div>
+
+        <div class="fg">
+          <div class="lbl"><i class="fa-solid fa-fingerprint tdim" style="font-size:11px"></i>Nama Paket<span class="req">*</span><span class="opt"><i class="fa-solid fa-circle-info"></i>Pengidentifikasi unik</span></div>
+          <div class="fld"><i class="fi fa-solid fa-fingerprint"></i><input type="text" class="mono hi" id="pkgName" placeholder="com.example.myapp" oninput="chkPkg();chkCfg()"></div>
+          <div class="hint"><i class="fa-solid fa-circle-info"></i>Gunakan domain terbalik: com.yourname.appname — huruf kecil, tanpa spasi</div>
+        </div>
+
+        <div class="r3 mb14">
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-code-branch tdim" style="font-size:10px"></i>Versi</div>
+            <div class="fld"><i class="fi fa-solid fa-code-branch"></i><input type="text" class="hi" id="verName" value="1.0.0"></div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-hashtag tdim" style="font-size:10px"></i>Kode</div>
+            <div class="fld"><i class="fi fa-solid fa-hashtag"></i><input type="number" class="hi" id="verCode" value="1" min="1"></div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-bullseye tdim" style="font-size:10px"></i>Target</div>
+            <select id="tgtSdk"><option value="33">API 33</option><option value="34" selected>API 34</option><option value="35">API 35</option></select>
+          </div>
+        </div>
+
+        <div class="fg">
+          <div class="lbl"><i class="fa-solid fa-align-left tdim" style="font-size:10px"></i>Deskripsi<span class="opt">opsional</span></div>
+          <textarea id="appDesc" placeholder="Jelaskan aplikasi Anda dalam beberapa kata…" maxlength="200" oninput="cC(this)"></textarea>
+          <div class="ccnt"><span id="appDescC">0</span>/200</div>
+        </div>
+
+        <div class="fg" style="margin-bottom:0">
+          <div class="lbl"><i class="fa-solid fa-image tdim" style="font-size:10px"></i>Ikon Aplikasi<span class="opt">opsional</span></div>
+          <div class="iz" id="iconZone">
+            <div class="ithumb" id="iconThumb"><i class="fa-solid fa-image"></i><img id="iconImg" alt=""></div>
+            <div>
+              <div class="iz-title">Upload Ikon</div>
+              <div class="iz-sub">PNG 512×512px disarankan</div>
+              <div class="iz-chips"><span class="chip">PNG</span><span class="chip">JPG</span><span class="chip">WebP</span></div>
+            </div>
+          </div>
+          <input type="file" id="iconInput" accept="image/*">
+        </div>
+      </div>
+    </div>
+
+    <!-- GitHub -->
+    <div class="card ca">
+      <div class="cb">
+        <div class="ched">
+          <div class="ctitle"><div class="cicon" style="background:rgba(255,255,255,.06)"><i class="fa-brands fa-github" style="color:var(--text2)"></i></div>GitHub Integration</div>
+          <span class="badge by" id="ghBadge"><i class="fa-solid fa-circle" style="font-size:6px"></i> Belum Terhubung</span>
+        </div>
+        <p class="cdesc">Hubungkan akun GitHub untuk membuat repo dan memicu CI/CD build.</p>
+
+        <div class="r2 mb14">
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-at tdim" style="font-size:11px"></i>Username<span class="req">*</span></div>
+            <div class="fld"><i class="fi fa-solid fa-at"></i><input type="text" class="hi" id="ghUser" placeholder="octocat" oninput="chkGH()"></div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-book tdim" style="font-size:10px"></i>Nama Repo<span class="req">*</span></div>
+            <div class="fld"><i class="fi fa-solid fa-book"></i><input type="text" class="mono hi" id="repoName" placeholder="my-app" oninput="chkGH()"></div>
+          </div>
+        </div>
+
+        <div class="fg mb14">
+          <div class="lbl"><i class="fa-solid fa-key tdim" style="font-size:11px"></i>Personal Access Token<span class="req">*</span><span class="opt"><i class="fa-solid fa-lock"></i>Hanya di memori</span></div>
+          <div class="fld"><i class="fi fa-solid fa-key"></i><input type="password" class="mono hi ha" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="chkGH()"><button class="fa2" id="tokenEye"><i class="fa-solid fa-eye"></i></button></div>
+          <div class="hint"><i class="fa-brands fa-github"></i>Scope: <code style="background:var(--bg2);padding:1px 5px;border-radius:4px;font-size:10px;font-family:var(--mono)">repo</code> <code style="background:var(--bg2);padding:1px 5px;border-radius:4px;font-size:10px;font-family:var(--mono)">workflow</code></div>
+        </div>
+
+        <div class="r2 mb14">
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-eye tdim" style="font-size:10px"></i>Visibilitas</div>
+            <div class="fld"><i class="fi fa-solid fa-eye"></i><select class="hi" id="repoVis"><option value="public">Public</option><option value="private">Private</option></select></div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <div class="lbl"><i class="fa-solid fa-code-branch tdim" style="font-size:10px"></i>Branch</div>
+            <div class="fld"><i class="fi fa-solid fa-code-branch"></i><input type="text" class="mono hi" id="repoBranch" value="main"></div>
+          </div>
+        </div>
+
+        <button class="btn btn-g btn-sm" id="testBtn" onclick="testGH()">
+          <span class="bt"><i class="fa-solid fa-plug"></i> Uji Koneksi</span><span class="spn"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- HTML Upload -->
+    <div class="card ca">
+      <div class="cb">
+        <div class="ched">
+          <div class="ctitle"><div class="cicon"><i class="fa-solid fa-file-code"></i></div>File HTML</div>
+          <span class="badge bb" id="htmlBadge"><i class="fa-solid fa-circle" style="font-size:6px"></i> Belum Ada</span>
+        </div>
+        <p class="cdesc">Upload file HTML Anda yang sudah memiliki CSS &amp; JavaScript inline dalam satu file.</p>
+        <div class="dz" id="htmlZone">
+          <span class="dz-ico"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+          <div class="dz-title">Ketuk untuk upload file HTML</div>
+          <div class="dz-sub">atau seret &amp; lepas di sini</div>
+          <div class="dz-types"><span class="dz-type">.html</span><span class="dz-type">.htm</span></div>
+          <div class="fc hidden" id="htmlChip">
+            <div class="fc-ico"><i class="fa-solid fa-file-code"></i></div>
+            <div class="fc-info"><div class="fc-name" id="htmlFN"></div><div class="fc-size" id="htmlFS"></div></div>
+            <button class="fc-del" id="htmlDel"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+        <input type="file" id="htmlInput" accept=".html,.htm">
+        <div class="ib ib-info mt8"><i class="fa-solid fa-circle-info"></i><div>Semua CSS dan JavaScript harus inline dalam satu file HTML. Resource eksternal tidak akan berfungsi offline di perangkat.</div></div>
+      </div>
+    </div>
+
+    <!-- Readiness -->
+    <div class="card">
+      <div class="cb">
+        <div class="slbl"><i class="fa-solid fa-clipboard-check tac"></i>Kesiapan Build</div>
+        <div class="ri"><div class="ri-dot" id="r0"><i class="fa-solid fa-circle" style="font-size:8px"></i></div><div class="ri-lbl" id="rl0">Nama aplikasi diisi</div></div>
+        <div class="ri"><div class="ri-dot" id="r1"><i class="fa-solid fa-circle" style="font-size:8px"></i></div><div class="ri-lbl" id="rl1">Nama paket valid</div></div>
+        <div class="ri"><div class="ri-dot" id="r2"><i class="fa-solid fa-circle" style="font-size:8px"></i></div><div class="ri-lbl" id="rl2">Kredensial GitHub</div></div>
+        <div class="ri"><div class="ri-dot" id="r3"><i class="fa-solid fa-circle" style="font-size:8px"></i></div><div class="ri-lbl" id="rl3">File HTML diupload</div></div>
+        <div class="ri"><div class="ri-dot" id="r4"><i class="fa-solid fa-circle" style="font-size:8px"></i></div><div class="ri-lbl tdim" id="rl4">Ikon aplikasi</div><div class="ri-tag">opsional</div></div>
+        <div class="pbar mt14" style="height:6px"><div class="pfill" id="readP" style="width:0%"></div></div>
+        <div class="fb mt8"><span class="txs tdim">Kelengkapan</span><span class="txs fmono tac fw7" id="readPct">0%</span></div>
+        <button class="btn btn-p btn-fw mt12" onclick="switchTab('build')"><i class="fa-solid fa-rocket"></i> Lanjut ke Build</button>
+      </div>
+    </div>
+
+  </div><!-- /editor -->
+
+  <!-- ===== PREVIEW ===== -->
+  <div class="panel" id="panel-preview">
+    <div class="card" style="padding:0">
+      <div class="bbar">
+        <div class="bdots"><div class="bdot"></div><div class="bdot"></div><div class="bdot"></div></div>
+        <div class="burl"><i class="fa-solid fa-lock" style="color:var(--accent);font-size:10px;flex-shrink:0"></i><span id="prevUrl">File belum dimuat</span></div>
+        <button class="tbtn" onclick="reloadPrev()" style="width:32px;height:32px;flex-shrink:0"><i class="fa-solid fa-rotate-right" style="font-size:13px"></i></button>
+      </div>
+      <div class="prev-empty" id="prevEmpty"><i class="fa-solid fa-browser"></i><p>Belum Ada File HTML</p><small>Upload file HTML di tab Editor<br>untuk melihat preview di sini</small></div>
+      <div class="hidden" id="prevWrap"><iframe id="prevFrame" style="width:100%;height:520px;border:none;display:block;background:#fff" sandbox="allow-scripts allow-same-origin"></iframe></div>
+    </div>
+    <div class="card mt12" style="padding:0">
+      <div class="cb"><div class="slbl mb12"><i class="fa-solid fa-mobile-screen-button tac"></i>Tampilan Perangkat</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <button class="btn btn-g btn-sm" onclick="setPH(520)"><i class="fa-solid fa-mobile-screen-button"></i> Mobile</button>
+          <button class="btn btn-g btn-sm" onclick="setPH(680)"><i class="fa-solid fa-tablet-screen-button"></i> Tablet</button>
+          <button class="btn btn-g btn-sm" onclick="setPH(800)"><i class="fa-solid fa-desktop"></i> Desktop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BUILD ===== -->
+  <div class="panel" id="panel-build">
+    <div class="bhero" id="buildHero">
+      <div class="horb"><i class="fa-solid fa-rocket"></i></div>
+      <div class="htitle">Siap Membangun APK</div>
+      <div class="hdesc">Lengkapi semua kolom di tab Editor, lalu jalankan pipeline build untuk menghasilkan APK Android Anda.</div>
+      <button class="btn btn-p" id="buildBtn" style="min-width:200px" onclick="startBuild()">
+        <span class="bt"><i class="fa-solid fa-play"></i> Mulai Build</span><span class="spn"></span>
+      </button>
+    </div>
+
+    <div class="card hidden" id="stepsCard">
+      <div class="cb">
+        <div class="fb mb12">
+          <div class="ctitle" style="font-size:14px"><div class="cicon"><i class="fa-solid fa-list-check"></i></div>Pipeline Build</div>
+          <span class="badge bb" id="pipeBadge"><i class="fa-solid fa-circle-notch fa-spin" style="font-size:9px"></i> Berjalan</span>
+        </div>
+        <div class="pbar mb14"><div class="pfill" id="buildP" style="width:0%"></div></div>
+        <div class="steps" id="stepsEl">
+          <div class="step" data-s="0"><div class="snum">1</div><div class="sbody"><div class="stitle"><i class="fa-solid fa-code-branch" style="margin-right:5px;font-size:10px"></i>Buat Repository</div><div class="ssub">Inisialisasi repo GitHub baru</div></div></div>
+          <div class="step" data-s="1"><div class="snum">2</div><div class="sbody"><div class="stitle"><i class="fa-solid fa-upload" style="margin-right:5px;font-size:10px"></i>Upload File Proyek</div><div class="ssub">Push source, config &amp; workflow</div></div></div>
+          <div class="step" data-s="2"><div class="snum">3</div><div class="sbody"><div class="stitle"><i class="fa-brands fa-github" style="margin-right:5px;font-size:10px"></i>Trigger GitHub Actions</div><div class="ssub">Mulai pipeline CI/CD</div></div></div>
+          <div class="step" data-s="3"><div class="snum">4</div><div class="sbody"><div class="stitle"><i class="fa-brands fa-android" style="margin-right:5px;font-size:10px"></i>Kompilasi APK</div><div class="ssub">Cordova + Gradle build process</div></div></div>
+          <div class="step" data-s="4"><div class="snum">5</div><div class="sbody"><div class="stitle"><i class="fa-solid fa-box-archive" style="margin-right:5px;font-size:10px"></i>Paketkan Artifact</div><div class="ssub">APK siap diunduh</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lwrap hidden" id="logsCard">
+      <div class="lhd"><div class="lhd-l"><i class="fa-solid fa-terminal"></i>Build Logs</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-g btn-xs" onclick="copyLogs()"><i class="fa-solid fa-copy"></i></button>
+          <button class="btn btn-g btn-xs" onclick="clearLogs()"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="lbody" id="logsBody"><span class="cur"></span></div>
+    </div>
+
+    <div class="dlcard" id="dlCard">
+      <span class="dlico"><i class="fa-solid fa-circle-check"></i></span>
+      <div class="dltitle">Build Berhasil! 🎉</div>
+      <div class="dlsub">APK Anda tersedia sebagai GitHub Actions artifact</div>
+      <div class="dlstats">
+        <div class="dlstat"><div class="dlstat-v">~3MB</div><div class="dlstat-k">Ukuran</div></div>
+        <div class="dlstat"><div class="dlstat-v">2m38s</div><div class="dlstat-k">Waktu</div></div>
+        <div class="dlstat"><div class="dlstat-v" id="dlApi">23+</div><div class="dlstat-k">Min API</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a class="btn btn-p btn-fw" href="#" target="_blank"><i class="fa-solid fa-download"></i> Unduh APK Artifact</a>
+        <button class="btn btn-g btn-fw" onclick="startBuild()"><i class="fa-solid fa-rotate-right"></i> Build Ulang</button>
+      </div>
+    </div>
+
+    <div class="card mt12"><div class="cb">
+      <div class="slbl"><i class="fa-solid fa-circle-info tac"></i>Informasi Build</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="fb"><span class="tsm tmuted">Tipe Build</span><span class="badge by">Debug APK</span></div>
+        <div class="fb"><span class="tsm tmuted">Runner</span><span class="tsm fmono">ubuntu-22.04</span></div>
+        <div class="fb"><span class="tsm tmuted">Estimasi Waktu</span><span class="tsm">2–5 menit</span></div>
+        <div class="fb"><span class="tsm tmuted">Artifact TTL</span><span class="tsm">90 hari</span></div>
+        <div class="fb"><span class="tsm tmuted">Cordova</span><span class="badge bg">v12.x</span></div>
+      </div>
+      <div class="ib ib-warn mt12"><i class="fa-solid fa-triangle-exclamation"></i>Debug build hanya untuk pengujian. Gunakan signed release build untuk distribusi.</div>
+    </div></div>
+  </div>
+
+  <!-- ===== ADVANCED ===== -->
+  <div class="panel" id="panel-advanced">
+    <div class="card ca">
+      <div class="cb">
+        <div class="ched">
+          <div class="ctitle"><div class="cicon"><i class="fa-solid fa-shield-halved"></i></div>Izin Android</div>
+          <span class="badge bb" id="permCnt">1 aktif</span>
+        </div>
+        <p class="cdesc">Pilih izin yang akan diminta aplikasi Anda dari pengguna.</p>
+        <div class="pgrid" id="permsGrid">
+          <div class="perm on" onclick="tPerm(this)"><i class="fa-solid fa-wifi"></i><span class="pname">INTERNET</span><span class="pck on"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-camera"></i><span class="pname">CAMERA</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-microphone"></i><span class="pname">MICROPHONE</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-location-dot"></i><span class="pname">LOCATION</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-database"></i><span class="pname">READ_STORAGE</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-floppy-disk"></i><span class="pname">WRITE_STORAGE</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-bell"></i><span class="pname">NOTIFICATIONS</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-address-book"></i><span class="pname">CONTACTS</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-bluetooth"></i><span class="pname">BLUETOOTH</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+          <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-mobile-screen"></i><span class="pname">VIBRATE</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ca"><div class="cb">
+      <div class="ctitle mb14"><div class="cicon"><i class="fa-solid fa-display"></i></div>Tampilan &amp; UX</div>
+      <div class="fg"><div class="lbl"><i class="fa-solid fa-rotate tdim" style="font-size:10px"></i>Orientasi Layar</div>
+        <div class="fld"><i class="fi fa-solid fa-rotate"></i><select class="hi" id="orient"><option value="default">Default (Sistem)</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option><option value="sensorPortrait">Sensor Portrait</option></select></div>
+      </div>
+      <div class="fg"><div class="lbl"><i class="fa-solid fa-bars tdim" style="font-size:10px"></i>Status Bar</div>
+        <select id="statusBar"><option>Default</option><option>Light</option><option>Dark</option><option>Tersembunyi</option></select>
+      </div>
+      <div class="fg" style="margin-bottom:0"><div class="lbl"><i class="fa-solid fa-hourglass-half tdim" style="font-size:10px"></i>Durasi Splash (ms)</div>
+        <div class="fld"><i class="fi fa-solid fa-hourglass-half"></i><input type="number" class="hi" id="splashDur" value="2000" min="0" max="10000"></div>
+      </div>
+    </div></div>
+
+    <div class="card ca"><div class="cb">
+      <div class="ched"><div class="ctitle"><div class="cicon"><i class="fa-solid fa-puzzle-piece"></i></div>Cordova Plugins</div>
+        <button class="btn btn-o btn-xs"><i class="fa-solid fa-plus"></i>Custom</button>
+      </div>
+      <div class="pgrid">
+        <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-camera"></i><span class="pname">plugin-camera</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+        <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-location-arrow"></i><span class="pname">plugin-geoloc</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+        <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-file"></i><span class="pname">plugin-file</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+        <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-share-nodes"></i><span class="pname">plugin-share</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+        <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-mobile"></i><span class="pname">plugin-device</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+        <div class="perm" onclick="tPerm(this)"><i class="fa-solid fa-bars"></i><span class="pname">plugin-status</span><span class="pck"><i class="fa-solid fa-check"></i></span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="panel" id="panel-settings">
+    <div class="card ca"><div class="cb">
+      <div class="ctitle mb4"><div class="cicon"><i class="fa-solid fa-sliders"></i></div>Preferensi</div>
+      <p class="cdesc">Sesuaikan perilaku aplikasi sesuai kebutuhan Anda.</p>
+      <div class="srow"><div><div class="sr-lbl"><i class="fa-solid fa-floppy-disk tac" style="margin-right:7px"></i>Auto-simpan</div><div class="sr-desc">Simpan data form otomatis antar sesi</div></div><button class="tog on" onclick="this.classList.toggle('on');toast('Tersimpan','tok','fa-solid fa-sliders')"></button></div>
+      <div class="srow"><div><div class="sr-lbl"><i class="fa-solid fa-rotate" style="color:var(--blue);margin-right:7px"></i>Auto-refresh Preview</div><div class="sr-desc">Update preview saat file berubah</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+      <!-- Theme Toggle Moved Here -->
+      <div class="srow"><div><div class="sr-lbl"><i class="fa-solid fa-moon" style="color:var(--purple);margin-right:7px"></i>Mode Gelap</div><div class="sr-desc">Tema dark/light</div></div><button class="tog on" id="darkTog" onclick="toggleTheme()"></button></div>
+      <div class="srow"><div><div class="sr-lbl"><i class="fa-solid fa-bell" style="color:var(--yellow);margin-right:7px"></i>Notifikasi Build</div><div class="sr-desc">Toast saat build selesai/gagal</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="srow"><div><div class="sr-lbl"><i class="fa-solid fa-terminal" style="color:var(--text2);margin-right:7px"></i>Log Verbose</div><div class="sr-desc">Tampilkan output log detail</div></div><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+    </div></div>
+
+    <div class="card ca"><div class="cb">
+      <div class="ctitle mb4"><div class="cicon"><i class="fa-solid fa-circle-info"></i></div>Tentang APK Builder</div>
+      <p class="cdesc mb14">Mengkonversi aplikasi HTML menjadi APK Android native menggunakan Apache Cordova dan GitHub Actions. Tanpa setup lokal.</p>
+      <div class="slbl"><i class="fa-solid fa-list-ol tac"></i>Cara Kerja</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;background:var(--abg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px">1</span><span class="tsm tmuted">Upload file HTML/CSS/JS yang sudah inline</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;background:var(--abg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px">2</span><span class="tsm tmuted">Konfigurasi metadata APK &amp; kredensial GitHub</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;background:var(--abg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px">3</span><span class="tsm tmuted">APK Builder membuat proyek Cordova di GitHub Anda</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;background:var(--abg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px">4</span><span class="tsm tmuted">GitHub Actions mengkompilasi APK debug otomatis</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;background:var(--abg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px">5</span><span class="tsm tmuted">Unduh artifact APK dari tab Actions GitHub</span></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:8px">
+        <div class="fb"><span class="tsm tdim">Versi</span><span class="fmono tac fw7">2.0.0</span></div>
+        <div class="fb"><span class="tsm tdim">Cordova</span><span class="badge bg">v12.x</span></div>
+        <div class="fb"><span class="tsm tdim">Android SDK</span><span class="badge bb">API 34</span></div>
+      </div>
+    </div></div>
+
+    <div class="card" style="border-color:rgba(255,90,114,.25);background:linear-gradient(135deg,rgba(255,90,114,.05),transparent)"><div class="cb">
+      <div class="ctitle mb4 tred"><div class="cicon" style="background:var(--redbg);color:var(--red)"><i class="fa-solid fa-triangle-exclamation"></i></div>Zona Bahaya</div>
+      <p class="cdesc mb14">Tindakan tidak dapat dibatalkan. Lanjutkan dengan hati-hati.</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-g btn-sm btn-fw" onclick="toast('Data lokal dihapus','twarn','fa-solid fa-eraser')"><i class="fa-solid fa-eraser"></i>Hapus Data Tersimpan</button>
+        <button class="btn btn-d btn-sm btn-fw" onclick="openModal()"><i class="fa-solid fa-rotate-left"></i>Reset Semua Kolom</button>
+      </div>
+    </div></div>
+  </div>
+
+</div><!-- /scroll -->
+
+<!-- BOTTOM NAV -->
+<div class="botnav">
+  <div class="nav-items">
+    <button class="ni active" data-tab="editor"><i class="fa-solid fa-code"></i><span>Editor</span></button>
+    <button class="ni" data-tab="preview"><i class="fa-solid fa-eye"></i><span>Preview</span></button>
+    <button class="ni" data-tab="build"><i class="fa-solid fa-rocket"></i><span>Build</span><span class="nbadge hidden" id="nbadge">!</span></button>
+    <button class="ni" data-tab="advanced"><i class="fa-solid fa-sliders"></i><span>Lanjutan</span></button>
+    <button class="ni" data-tab="settings"><i class="fa-solid fa-gear"></i><span>Setelan</span></button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- TOASTS -->
+<div class="twrap" id="tw"></div>
+
+<!-- MODAL SHEET -->
+<div class="mbg" id="modal">
+  <div class="msheet">
+    <div class="mhandle"></div>
+    <div class="mtitle"><i class="fa-solid fa-triangle-exclamation tred" style="margin-right:8px"></i>Reset Semua Kolom?</div>
+    <div class="mbody">Ini akan menghapus semua data form, file yang diupload, dan konfigurasi. Tindakan ini tidak dapat dibatalkan.</div>
+    <div class="mactions">
+      <button class="btn btn-g" style="flex:1" onclick="closeModal()">Batal</button>
+      <button class="btn btn-d" style="flex:1" onclick="resetAll()"><i class="fa-solid fa-rotate-left"></i>Reset</button>
+    </div>
+  </div>
+</div>
+
+   <script>
+/* TABS */
+function switchTab(id){
+  document.querySelectorAll('.ni').forEach(b=>b.classList.toggle('active',b.dataset.tab===id))
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+id))
+  document.getElementById('scroll').scrollTop=0
+}
+document.querySelectorAll('.ni').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)))
+
+/* THEME */
+let dark=true
+function applyTheme(){
+  const d=document.documentElement
+  if(dark){
+    d.style.setProperty('--bg','#0c0f12');d.style.setProperty('--bg1','#111519');d.style.setProperty('--bg2','#161c22');d.style.setProperty('--bg3','#1c242c');
+    d.style.setProperty('--card','#1a2029');d.style.setProperty('--card2','#202830');d.style.setProperty('--border','#252f38');d.style.setProperty('--border2','#2e3b47');
+    d.style.setProperty('--text','#dde6ef');d.style.setProperty('--text2','#7a95a8');d.style.setProperty('--text3','#3f5463');
+    document.querySelector('meta[name="theme-color"]').content='#0c0f12'
+  }else{
+    d.style.setProperty('--bg','#f0f4f8');d.style.setProperty('--bg1','#e8edf3');d.style.setProperty('--bg2','#dde4ec');d.style.setProperty('--bg3','#d3dce6');
+    d.style.setProperty('--card','#ffffff');d.style.setProperty('--card2','#f5f8fb');d.style.setProperty('--border','#c8d5e0');d.style.setProperty('--border2','#b0c0cc');
+    d.style.setProperty('--text','#1a2733');d.style.setProperty('--text2','#4a6070');d.style.setProperty('--text3','#8fa0ae');
+    document.querySelector('meta[name="theme-color"]').content='#f0f4f8'
+  }
+  const dt=document.getElementById('darkTog');if(dt)dt.classList.toggle('on',dark)
+}
+function toggleTheme(){dark=!dark;applyTheme()}
+applyTheme()
+
+/* CHAR COUNT */
+function cC(el){const c=document.getElementById(el.id+'C');if(c)c.textContent=el.value.length}
+
+/* VALIDATE */
+function chkCfg(){
+  const nm=document.getElementById('apkName').value.trim()
+  setR(0,nm?'ok':null)
+  const pk=document.getElementById('pkgName').value.trim()
+  const pkok=/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/.test(pk)
+  const b=document.getElementById('cfgBadge')
+  if(nm&&pkok){b.className='badge bg';b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px"></i> Lengkap'}
+  else{b.className='badge by';b.innerHTML='<i class="fa-solid fa-circle" style="font-size:6px"></i> Belum Lengkap'}
+  updR()
+}
+function chkPkg(){
+  const v=document.getElementById('pkgName').value.trim()
+  const ok=/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/.test(v)
+  document.getElementById('pkgName').style.borderColor=v?(ok?'var(--accent)':'var(--red)'):'var(--border)'
+  setR(1,v?(ok?'ok':'err'):null);updR()
+}
+function chkGH(){
+  const u=document.getElementById('ghUser').value.trim()
+  const t=document.getElementById('ghToken').value.trim()
+  const r=document.getElementById('repoName').value.trim()
+  const ok=!!(u&&t&&r);setR(2,ok?'ok':null)
+  const b=document.getElementById('ghBadge')
+  if(ok){b.className='badge bg';b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px"></i> Terhubung'}
+  else{b.className='badge by';b.innerHTML='<i class="fa-solid fa-circle" style="font-size:6px"></i> Belum Terhubung'}
+  updR()
+}
+function setR(i,s){
+  const d=document.getElementById('r'+i),l=document.getElementById('rl'+i)
+  d.className='ri-dot'+(s?' '+s:'')
+  if(s==='ok'){d.innerHTML='<i class="fa-solid fa-check" style="font-size:9px"></i>';l.classList.add('ok')}
+  else if(s==='err'){d.innerHTML='<i class="fa-solid fa-xmark" style="font-size:9px"></i>';l.classList.remove('ok')}
+  else{d.innerHTML='<i class="fa-solid fa-circle" style="font-size:8px"></i>';l.classList.remove('ok')}
+}
+function updR(){
+  const cnt=[0,1,2,3].filter(i=>document.getElementById('r'+i).classList.contains('ok')).length
+  const p=Math.round(cnt/4*100)
+  document.getElementById('readP').style.width=p+'%'
+  document.getElementById('readPct').textContent=p+'%'
+}
+
+/* TOKEN EYE */
+document.getElementById('tokenEye').addEventListener('click',function(){
+  const inp=document.getElementById('ghToken'),on=inp.type==='password'
+  inp.type=on?'text':'password'
+  this.innerHTML=on?'<i class="fa-solid fa-eye-slash"></i>':'<i class="fa-solid fa-eye"></i>'
+})
+
+/* TEST GH */
+async function testGH(){
+  const btn=document.getElementById('testBtn');btn.classList.add('loading');btn.disabled=true
+  const user = document.getElementById('ghUser').value.trim();
+  const token = document.getElementById('ghToken').value.trim();
+  addLog('Mencoba koneksi ke GitHub API...', '');
+  
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { Authorization: `token ${token}` }
+    });
+    const data = await res.json();
+    if(res.ok && data.login === user){
+      toast('Koneksi berhasil: ' + data.login, 'tok', 'fa-brands fa-github');
+      addLog('Validasi sukses!', 'ok'); chkGH();
+    } else {
+      toast('User/Token tidak cocok', 'terr', 'fa-solid fa-xmark');
+      addLog('Gagal: User/Token mismatch', 'err');
+    }
+  } catch(e) {
+    toast('Gagal koneksi', 'terr', 'fa-solid fa-wifi');
+  }
+  btn.classList.remove('loading');btn.disabled=false;
+}
+
+/* ICON UPLOAD */
+document.getElementById('iconZone').addEventListener('click',()=>document.getElementById('iconInput').click())
+document.getElementById('iconInput').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return
+  const r=new FileReader();r.onload=ev=>{
+    const img=document.getElementById('iconImg');img.src=ev.target.result;img.style.display='block'
+    document.querySelector('.ithumb i').style.display='none'
+    document.getElementById('iconZone').classList.add('filled')
+    setR(4,'ok');updR();toast('Ikon dimuat','tok','fa-solid fa-image')
+  };r.readAsDataURL(f)
+})
+
+/* HTML UPLOAD */
+let html=null
+const hz=document.getElementById('htmlZone')
+hz.addEventListener('click',e=>{if(!e.target.closest('#htmlDel'))document.getElementById('htmlInput').click()})
+hz.addEventListener('dragover',e=>{e.preventDefault();hz.classList.add('over')})
+hz.addEventListener('dragleave',()=>hz.classList.remove('over'))
+hz.addEventListener('drop',e=>{e.preventDefault();hz.classList.remove('over');if(e.dataTransfer.files[0])loadH(e.dataTransfer.files[0])})
+document.getElementById('htmlInput').addEventListener('change',e=>{if(e.target.files[0])loadH(e.target.files[0])})
+document.getElementById('htmlDel').addEventListener('click',e=>{e.stopPropagation();delH()})
+
+function loadH(f){
+  if(!f.name.match(/\.html?$/i)){toast('Upload file .html saja','terr','fa-solid fa-triangle-exclamation');return}
+  const r=new FileReader();r.onload=ev=>{
+    html=ev.target.result
+    document.getElementById('htmlFN').textContent=f.name
+    document.getElementById('htmlFS').textContent=fmt(f.size)
+    document.getElementById('htmlChip').classList.remove('hidden')
+    hz.classList.add('filled')
+    const b=document.getElementById('htmlBadge');b.className='badge bg';b.innerHTML='<i class="fa-solid fa-check" style="font-size:8px"></i> Dimuat'
+    setR(3,'ok');updR()
+    document.getElementById('prevUrl').textContent=f.name
+    document.getElementById('prevEmpty').classList.add('hidden')
+    document.getElementById('prevWrap').classList.remove('hidden')
+    document.getElementById('prevFrame').srcdoc=html
+    document.getElementById('nbadge').classList.remove('hidden')
+    toast(f.name+' berhasil dimuat','tok','fa-solid fa-file-code')
+  };r.readAsText(f)
+}
+function delH(){
+  html=null;document.getElementById('htmlChip').classList.add('hidden');hz.classList.remove('filled')
+  document.getElementById('htmlInput').value=''
+  const b=document.getElementById('htmlBadge');b.className='badge bb';b.innerHTML='<i class="fa-solid fa-circle" style="font-size:6px"></i> Belum Ada'
+  setR(3,null);updR()
+  document.getElementById('prevEmpty').classList.remove('hidden');document.getElementById('prevWrap').classList.add('hidden')
+  document.getElementById('nbadge').classList.add('hidden')
+}
+function fmt(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(2)+'MB'}
+
+/* PREVIEW */
+function reloadPrev(){
+  if(!html){toast('Belum ada file HTML','twarn','fa-solid fa-triangle-exclamation');return}
+  const f=document.getElementById('prevFrame');f.srcdoc='';setTimeout(()=>f.srcdoc=html,50)
+  toast('Preview di-reload','tinfo','fa-solid fa-rotate-right')
+}
+function setPH(h){document.getElementById('prevFrame').style.height=h+'px'}
+
+/* GITHUB API CORE */
+function toBase64(str) {
+  try {
+    return btoa(unescape(encodeURIComponent(str)));
+  } catch(e) {
+    return btoa(str);
+  }
+}
+
+async function ghAPI(endpoint, method, token, body = null) {
+  const opts = {
+    method: method,
+    headers: {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'WebIDE-Build-Script'
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`https://api.github.com${endpoint}`, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || `HTTP Error ${res.status}`);
+  return data;
+}
+
+/* UTILS FOR BUILD */
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+/* BUILD PROCESS */
+let building = false;
+
+async function startBuild(){
+  const u = document.getElementById('ghUser').value.trim();
+  const t = document.getElementById('ghToken').value.trim();
+  const r = document.getElementById('repoName').value.trim();
+  const nm = document.getElementById('apkName').value.trim();
+  const pk = document.getElementById('pkgName').value.trim();
+  const minSdk = document.getElementById('minSdk').value;
+
+  // Validasi
+  if(!nm||!pk||!u||!t||!r||!html){
+    toast('Lengkapi semua kolom & upload HTML','twarn','fa-solid fa-triangle-exclamation');return
+  }
+  if(building) return;
+  building = true;
+
+  // UI Setup
+  const btn = document.getElementById('buildBtn');
+  btn.classList.add('loading'); btn.disabled=true;
+  document.getElementById('stepsCard').classList.remove('hidden');
+  document.getElementById('logsCard').classList.remove('hidden');
+  document.getElementById('dlCard').classList.remove('show');
+  document.getElementById('logsBody').innerHTML='<span class="cur"></span>';
+  rstSteps();
+
+  try {
+    // === STEP 0: VALIDASI ===
+    setStep(0, 'active');
+    addLog('Memvalidasi input...', 'info');
+    await delay(5000);
+
+    // === STEP 1: REPO CHECK/CREATE ===
+    setStep(0, 'done'); setStep(1, 'active');
+    addLog(`Cek repository ${u}/${r}...`, '');
+    
+    let repoExists = false;
+    try {
+      await ghAPI(`/repos/${u}/${r}`, 'GET', t);
+      repoExists = true;
+      addLog('Repository ditemukan.', 'ok');
+    } catch (e) {
+      if (e.message.includes('Not Found')) {
+        addLog('Repo tidak ada, membuat baru...', 'info');
+        await ghAPI('/user/repos', 'POST', t, { 
+          name: r, 
+          auto_init: true, 
+          private: false 
+        });
+        addLog('Repository berhasil dibuat!', 'ok');
+        await delay(50000); 
+      } else {
+        throw new Error('Gagal cek repo: ' + e.message);
+      }
+    }
+
+    // === STEP 2: PREPARE FILES ===
+    setStep(1, 'done'); setStep(2, 'active');
+    addLog('Menyiapkan file config & workflow...', '');
+
+    // 1. Config.xml
+    const configXml = `<?xml version='1.0' encoding='utf-8'?>
+<widget id="${pk}" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>${nm}</name>
+    <description>Generated by WebIDE</description>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <preference name="AndroidMinSdkVersion" value="${minSdk}" />
+    <engine name="android" spec="^12.0.0" />
+</widget>`;
+
+    // 2. Main Workflow
+    const workflowYml = `name: Build APK
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+
+    - name: Install Cordova
+      run: npm install -g cordova
+
+    - name: Create Project Structure
+      run: |
+        mkdir -p www
+        # Files are already checked out
+
+    - name: Add Android Platform
+      run: cordova platform add android
+
+    - name: Build Debug APK
+      run: cordova build android
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${nm.replace(/\s+/g, '-')}-APK
+        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk`;
+
+    // 3. Package.json
+    const pkgJson = JSON.stringify({
+      name: r,
+      displayName: nm,
+      version: "1.0.0",
+      private: true
+    }, null, 2);
+
+    // === STEP 3: UPLOAD FILES ===
+    setStep(2, 'done'); setStep(3, 'active');
+    
+    const files = [
+      { path: 'config.xml', content: configXml },
+      { path: 'www/index.html', content: html },
+      { path: '.github/workflows/build.yml', content: workflowYml },
+      { path: 'package.json', content: pkgJson }
+    ];
+
+    for (const file of files) {
+      addLog(`Upload: ${file.path}`, '');
+      let sha = null;
+      try {
+        const data = await ghAPI(`/repos/${u}/${r}/contents/${file.path}?ref=main`, 'GET', t);
+        sha = data.sha;
+      } catch(e) {
+        try {
+           const dataM = await ghAPI(`/repos/${u}/${r}/contents/${file.path}?ref=master`, 'GET', t);
+           sha = dataM.sha;
+        } catch(e2) { }
+      }
+
+      const body = {
+        message: `Update ${file.path} via WebIDE`,
+        content: toBase64(file.content),
+        branch: 'main'
+      };
+      if(sha) body.sha = sha;
+
+      try {
+        await ghAPI(`/repos/${u}/${r}/contents/${file.path}`, 'PUT', t, body);
+      } catch(e) {
+        body.branch = 'master';
+        try {
+           const dataM = await ghAPI(`/repos/${u}/${r}/contents/${file.path}?ref=master`, 'GET', t);
+           body.sha = dataM.sha;
+        } catch(e2){}
+        
+        await ghAPI(`/repos/${u}/${r}/contents/${file.path}`, 'PUT', t, body);
+      }
+      await delay(50000);
+    }
+
+    // === FINISH ===
+    setStep(3, 'done'); setStep(4, 'active');
+    addLog('File berhasil di-push!', 'ok');
+    addLog('GitHub Actions sedang berjalan...', 'info');
+    
+    await delay(100000);
+    
+    setStep(4, 'done');
+    const pipeB = document.getElementById('pipeBadge');
+    pipeB.className='badge bg';
+    pipeB.innerHTML='<i class="fa-solid fa-check" style="font-size:8px"></i> Dikirim';
+    
+    const dlBtn = document.getElementById('dlBtn');
+    const actionsUrl = `https://github.com/${u}/${r}/actions`;
+    
+    if(dlBtn) {
+        dlBtn.onclick = () => window.open(actionsUrl, '_blank');
+        dlBtn.innerHTML = '<i class="fa-solid fa-external-link"></i> Buka GitHub Actions';
+    }
+    
+    document.getElementById('dlCard').classList.add('show');
+    toast('Build sukses! Cek GitHub untuk download.', 'tok', 'fa-solid fa-check');
+
+  } catch(err) {
+    console.error(err);
+    addLog(`ERROR: ${err.message}`, 'err');
+    toast('Gagal: ' + err.message, 'terr', 'fa-solid fa-xmark');
+    const activeStep = document.querySelector('.step.active');
+    if(activeStep) setStep(activeStep.dataset.s, 'error');
+  } finally {
+    building = false;
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+/* LOG & UI HELPERS */
+function rstSteps(){
+  document.querySelectorAll('.step').forEach(s=>{s.className='step';s.querySelector('.snum').textContent=+s.dataset.s+1})
+  const pb=document.getElementById('pipeBadge');pb.className='badge bb';pb.innerHTML='<i class="fa-solid fa-circle-notch fa-spin" style="font-size:9px"></i> Berjalan'
+}
+function setStep(n,state){
+  const el=document.querySelector(`.step[data-s="${n}"]`);if(!el)return
+  el.className='step '+state
+  if(state==='done')el.querySelector('.snum').innerHTML='<i class="fa-solid fa-check" style="font-size:10px"></i>'
+  else if(state==='error')el.querySelector('.snum').innerHTML='<i class="fa-solid fa-xmark" style="font-size:10px"></i>'
+}
+function addLog(msg,type=''){
+  const b=document.getElementById('logsBody');const c=b.querySelector('.cur');if(c)c.remove()
+  const d=document.createElement('div');d.className='log'+(type?' '+type:'')
+  const n=new Date();const ts=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')+':'+n.getSeconds().toString().padStart(2,'0')
+  d.innerHTML=`<span class="lts">${ts}</span><span class="lmsg">${msg}</span>`
+  b.appendChild(d);const nc=document.createElement('span');nc.className='cur';b.appendChild(nc);b.scrollTop=b.scrollHeight
+}
+function clearLogs(){document.getElementById('logsBody').innerHTML='<span class="cur"></span>'}
+function copyLogs(){
+  const txt=[...document.querySelectorAll('.log')].map(l=>l.querySelector('.lts').textContent+' '+l.querySelector('.lmsg').textContent).join('\n')
+  navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('Log disalin!','tok','fa-solid fa-clipboard-check'))
+}
+
+/* PERMS */
+function tPerm(el){
+  el.classList.toggle('on');const ck=el.querySelector('.pck');ck.classList.toggle('on',el.classList.contains('on'))
+  const cnt=document.querySelectorAll('#permsGrid .perm.on').length;const b=document.getElementById('permCnt');if(b)b.textContent=cnt+' aktif'
+}
+
+/* TOAST */
+function toast(msg,type='tinfo',icon='fa-solid fa-circle-info'){
+  const icons={tok:'fa-solid fa-circle-check',terr:'fa-solid fa-circle-xmark',twarn:'fa-solid fa-triangle-exclamation',tinfo:'fa-solid fa-circle-info'}
+  const t=document.createElement('div');t.className='t '+type;t.innerHTML=`<i class="${icon||icons[type]}"></i><span>${msg}</span>`
+  document.getElementById('tw').appendChild(t)
+  t.addEventListener('click',()=>{t.classList.add('out');setTimeout(()=>t.remove(),300)})
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300)},3500)
+}
+
+/* MODAL */
+function openModal(){document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()})
+function resetAll(){
+  document.querySelectorAll('input:not([type=file]),textarea').forEach(el=>{if(el.defaultValue!=null)el.value=el.defaultValue;else el.value=''})
+  delH();closeModal();toast('Semua kolom direset','twarn','fa-solid fa-rotate-left')
+}
+
+document.getElementById('saveBtn').addEventListener('click',()=>toast('Data form disimpan!','tok','fa-solid fa-floppy-disk'))
+updR()
+</script>
+    <script src="../js/lang.js"></script>
+</body>
+
+</html>
